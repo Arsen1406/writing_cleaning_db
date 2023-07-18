@@ -1,0 +1,23 @@
+version: '3.11'
+
+services:
+
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: 'postgres'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+    ports:
+      - '5432:5432'
+
+
+volumes:
+  db_value:
+  redis_value:
+  celery_value:

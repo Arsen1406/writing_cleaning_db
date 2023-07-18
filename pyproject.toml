@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "src"
+version = "0.1.0"
+description = ""
+authors = ["Arsen1406 <arsen8577711@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sqlalchemy = "^2.0.19"
+alembic = "^1.11.1"
+faker = "^19.1.0"
+loguru = "^0.7.0"
+pydantic = "1.10.5"
+psycopg2-binary = "^2.9.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
