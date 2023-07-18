@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, func
 from sqlalchemy.orm import Session
 from src.schemas import GeneratedData
 from src.connect_db import engine
@@ -16,42 +16,53 @@ MAX_OBJECTS_QUERY = 30
 
 class DatabaseUpdateSession:
 
+    def new_data(self) -> dict:
+        data = {
+            'data': fake.bothify(text='????-########'),
+            'date': datetime.now(),
+        }
+
+        logger.info(f'data is being transmitted -> {data}')
+        return data
+
     def add_obj(self, data):
         stmt = (
             insert(GeneratedData).
-            values(data=data.get('data'), date=data.get('date'))
-        ).returning(GeneratedData)
-        self.recordinc(stmt)
+            values(data=data.get('data'), date=data.get('date')).
+            returning(GeneratedData)
+        )
+        return self.get_session(stmt, True)
 
     def get_all_obj(self):
         stmt = select(GeneratedData)
-        self.recordinc(stmt)
+        return self.get_session(stmt)
 
+    def get_count_obj(self):
+        stmt = select(func.count()).select_from(GeneratedData)
+        return self.get_session(stmt)
 
-    def recordinc(self, stmp):
+    def get_session(self, stmt, create=False):
         with Session(engine) as session:
-            obj = session.scalars(stmp).all()
-
+            if create is False:
+                return session.scalars(stmt).all()
+            query = session.execute(stmt)
+            return query.scalars().all()
 
     def script(self) -> None:
         while True:
-            data = dict()
-            data['data'] = fake.bothify(text='????-########')
-            data['date'] = datetime.now()
-            logger.info(f'data is being transmitted -> {data}')
+            data = self.new_data()
 
             self.add_obj(data)
             logger.info(f'data recorded')
 
-            all_data = self.get_all_obj()
-            logger.warning(f'there are {all_data} objects in the database')
-            #
-            # if all_data.count() >= MAX_OBJECTS_QUERY:
-            #     all_data.delete()
-            #     all_data.commit()
-            #     logger.warning(f'data deleted')
-            # time.sleep(5)
-            break
+            count_obj = self.get_count_obj()[0]
+            logger.info(f'there are {count_obj} objects in the database')
+
+            if count_obj >= MAX_OBJECTS_QUERY:
+                logger.warning(f'data deleted')
+
+            time.sleep(1)
+
 
 
 def main() -> None:
@@ -59,44 +70,5 @@ def main() -> None:
     scr.script()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
-
-
-
-# def main() -> None:
-#     while True:
-#         data = dict()
-#     data['data'] = fake.bothify(text='????-########')
-#     data['date'] = datetime.now()
-#     logger.info(f'data is being transmitted -> {data}')
-#
-#     stmt = insert(data)....
-#
-#     get_session(stmt)
-#
-#     self.session.add(new_data)
-#     self.session.commit()
-#     logger.info(f'data recorded')
-#
-#     all_data = self.session.query(GeneratedData)
-#     logger.warning(f'there are {all_data.count()} objects in the database')
-#
-#     if all_data.count() >= MAX_OBJECTS_QUERY:
-#         all_data.delete()
-#         all_data.commit()
-#         logger.warning(f'data deleted')
-#     time.sleep(5)
-#
-#
-# if __name__ == "__main__":
-#     main()
-#
-#
-# def get_session(query) -> Session:
-#     with sessions() as session:
-#         try:
-#             t = session.execute(query)
-#             return t.scalars().all()
-#         except:
-#             session.rollback()

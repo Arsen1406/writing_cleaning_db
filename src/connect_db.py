@@ -1,3 +1,20 @@
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from schemas import BaseModel
+from setting import settings
 
-engine = create_engine('postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/postgres')
+DB_PATH = (
+    f'postgresql+psycopg2://'
+    f'{settings.DB_USER}:'
+    f'{settings.DB_PASS}@'
+    f'{settings.DB_HOST}:'
+    f'{settings.DB_PORT}'
+    f'/postgres'
+)
+
+engine = create_engine(DB_PATH)
+
+
+sessions = sessionmaker()
+sessions.configure(bind=engine)
+BaseModel.metadata.create_all(engine)

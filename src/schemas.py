@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import declarative_base
 
 BaseModel = declarative_base()
@@ -15,5 +15,5 @@ class GeneratedData(BaseModel):
         primary_key=True,
         autoincrement=True
     )
-    data = Column(String(128), comment='Сгенерированая строка')
-    date = Column(Date, comment='Дата создания')
+    data = Column(String, comment='Сгенерированая строка')
+    date = Column(DateTime, comment='Дата создания')
