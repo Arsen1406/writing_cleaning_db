@@ -6,7 +6,7 @@ BaseModel = declarative_base()
 
 class GeneratedData(BaseModel):
 
-    __tablename__ = 'generated_data'
+    __tablename__ = 'free_entry'
 
     id = Column(
         Integer,
